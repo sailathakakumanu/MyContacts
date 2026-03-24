@@ -162,7 +162,7 @@ export default function ContactFormPage() {
             <strong>Error:</strong> {error}
           </div>
         )}
-
+        {/* Form fields */}
         <form onSubmit={handleSubmit}>
           <div className="form-row">
             <div className="form-group">
