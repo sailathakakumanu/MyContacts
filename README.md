@@ -203,8 +203,3 @@ MyContacts demonstrates a real-world contact management system with secure data 
 
 ---
 
-##Author
-
-* Your Name
-
----
