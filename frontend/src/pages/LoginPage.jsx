@@ -21,11 +21,14 @@ export default function LoginPage() {
       await login(email, password);
       navigate('/');
     } catch (err) {
-      const msg = err.response?.data?.error
-        || err.response?.data?.fieldErrors
-          ? Object.values(err.response?.data?.fieldErrors || {}).join(', ')
-          : 'Login failed. Please check your credentials.';
-      setError(typeof msg === 'string' ? msg : 'Login failed. Please check your credentials.');
+      // Prefer backend error message for wrong password or other issues
+      let msg = 'Login failed. Please check your credentials.';
+      if (err.response?.data?.error) {
+        msg = err.response.data.error;
+      } else if (err.response?.data?.fieldErrors) {
+        msg = Object.values(err.response.data.fieldErrors).join(', ');
+      }
+      setError(msg);
     } finally {
       setLoading(false);
     }

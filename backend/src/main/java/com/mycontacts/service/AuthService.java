@@ -50,19 +50,23 @@ public class AuthService {
      * Authenticate and create an HTTP session. Stores user ID in session.
      */
     public AuthResponse login(LoginRequest request, HttpSession session) {
-        Authentication authentication = authenticationManager.authenticate(
+        try {
+            Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-        );
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        // Store user info in session for easy retrieval
-        User user = userRepository.findByEmail(request.getEmail())
+            // Store user info in session for easy retrieval
+            User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        session.setAttribute("userId", user.getId());
-        session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
+            session.setAttribute("userId", user.getId());
+            session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
 
-        return new AuthResponse("Login successful", user.getUsername(), user.getEmail());
+            return new AuthResponse("Login successful", user.getUsername(), user.getEmail());
+        } catch (org.springframework.security.authentication.BadCredentialsException ex) {
+            throw new IllegalArgumentException("Incorrect password. Please try again.");
+        }
+        // Let other exceptions bubble up for global handler
     }
 
     /**
